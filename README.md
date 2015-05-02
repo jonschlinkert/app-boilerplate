@@ -11,7 +11,7 @@ npm i app-boilerplate --save
 ## Usage
 
 ```js
-var appBoilerplate = require('app-boilerplate');
+var app = require('app-boilerplate');
 ```
 
 ## API
@@ -21,7 +21,6 @@ var appBoilerplate = require('app-boilerplate');
 
 ## Related projects
 
-<!-- add an array of related projects, then un-escape the helper -->
 {%= related([]) %}
 
 ## Running tests
