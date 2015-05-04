@@ -1,10 +1,3 @@
-/*!
- * app-boilerplate <https://github.com/jonschlinkert/app-boilerplate>
- *
- * Copyright (c) 2015, Jon Schlinkert.
- * Licensed under the MIT License.
- */
-
 'use strict';
 
 var diff = require('diff');
@@ -156,14 +149,14 @@ App.prototype.getCollection = function(name) {
  * Get a file from the current session.
  *
  * ```js
- * var file = app.getTaskFile(file);
+ * var file = app.getFile(file);
  * ```
  *
  * @return {Object} `file` Vinyl file object. Must have an `id` property.
  * @api public
  */
 
-App.prototype.getTaskFile = function(file, id) {
+App.prototype.getFile = function(file, id) {
   return this.getCollection(id)[file.id];
 };
 
@@ -186,14 +179,14 @@ App.prototype.pushToStream = function(id, stream) {
 
 /**
  * `taskFiles` is a session-context-specific getter that
- * returns the collection of files from the current `task`.
+ * returns the collection of files from the currently running `task`.
  *
  * ```js
- * var files = app.taskFiles;
+ * var taskFiles = app.taskFiles;
  * ```
  *
  * @name .taskFiles
- * @return {Object} Get the files from the current task.
+ * @return {Object} Get the files from the currently running task.
  * @api public
  */
 
