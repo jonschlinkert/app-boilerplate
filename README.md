@@ -1,6 +1,6 @@
 # app-boilerplate [![NPM version](https://badge.fury.io/js/app-boilerplate.svg)](http://badge.fury.io/js/app-boilerplate)
 
-> Boilerplate for creating a node.js application based on Template, vinyl and orchestrator.
+> Boilerplate for creating a node.js application based on Template, vinyl and orchestrator. This consists of the core, generalized components of assemble, verb and generate.
 
 ## Features
 
@@ -241,7 +241,10 @@ app.task('watch', function() {
 
 ## Related projects
 
-{%= related(['template', 'verb', 'assemble', 'generate']) %}
+* [assemble](http://assemble.io): Static site generator for Grunt.js, Yeoman and Node.js. Used by Zurb Foundation, Zurb Ink, H5BP/Effeckt,… [more](http://assemble.io)
+* [generate](https://github.com/generate/generate): Project generator, for node.js.
+* [template](https://github.com/jonschlinkert/template): Render templates using any engine. Supports, layouts, pages, partials and custom template types. Use template… [more](https://github.com/jonschlinkert/template)
+* [verb](https://github.com/assemble/verb): Documentation generator for GitHub projects. Extremely powerful, easy to use, can generate anything from API… [more](https://github.com/assemble/verb)
 
 ## Running tests
 
