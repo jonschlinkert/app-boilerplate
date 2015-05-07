@@ -1,4 +1,4 @@
-## Config
+## CLI
 
 > Persist, get and update config values
 
