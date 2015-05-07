@@ -2,6 +2,7 @@
 
 var app = require('./');
 
+// testing random stuff
 app.disable('foo');
 
 app.task('default', function () {
