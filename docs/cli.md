@@ -1,15 +1,27 @@
-## CLI
+### CLI
 
-> Persist, get and update config values
+> CLI for persisting and getting values that can be used across projects
 
 **Set**
 
-Set a value on `app.config.cache`:
+Set a value:
 
 ```sh
 $ app --set foo=bar
-# {config: {cache: {foo: 'bar'}}}
+#=> {foo: 'bar'}
 
 $ app --set baz
-# {config: {cache: {baz: true}}}
+#=> {baz: true}
+```
+
+**Get**
+
+Get a value:
+
+```sh
+$ app --get foo
+#=> bar
+
+$ app --get baz
+#=> true
 ```
