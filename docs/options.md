@@ -2,6 +2,8 @@
 
 > Set, enable, and disable application options
 
+See [Config Overview](./config-overview.md) to learn more about the available methods for object caching and storage.
+
 ## .option
 
 **Set an option:**
@@ -18,7 +20,24 @@ app.option('a');
 //=> true
 ```
 
+Or:
+
+```js
+var a = app.options.a;
+//=> true
+```
+
+**Extend an option:**
+
+```js
+app.option({a: {b: 'c'}});
+app.option({a: {d: 'e'}});
+//=> {a: {b: 'c', d: 'e'}}
+```
+
 ## .enable
+
+Enable `key`:
 
 ```js
 app.enable('a');
@@ -76,7 +95,7 @@ app.isTrue('c');
 
 ## .isFalse
 
-Returns true if the value of `key` is strictly `false`.
+Returns true if `key` is strictly `false`.
 
 ```js
 app.option('a', null);
@@ -90,7 +109,7 @@ app.isFalse('c');
 
 ## .isBoolean
 
-Return true if the value of key is either `true` or `false`.
+Return true if `key` is either strictly `true` or strictly `false`.
 
 ```js
 app.option('a', 'b');
