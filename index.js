@@ -3,6 +3,8 @@
 var diff = require('diff');
 var chalk = require('chalk');
 var extend = require('lodash')._.extend;
+var es = require('event-stream');
+var through = require('through2');
 var Template = require('template');
 var toVinyl = require('to-vinyl');
 var Task = require('orchestrator');
@@ -25,11 +27,40 @@ function App() {
   Template.apply(this, arguments);
   Task.apply(this, arguments);
   this.session = session;
+  this.plugins = {};
   init(this);
 }
 
 extend(App.prototype, Task.prototype);
 Template.extend(App.prototype);
+
+App.prototype.plugin = function(name, fn) {
+  if (arguments.length === 1) {
+    return this.plugins[name];
+  }
+  this.plugins[name] = fn.bind(this);
+  return this;
+};
+
+App.prototype.combine = function(arr, options) {
+  var len = arr.length;
+  var res = [], i = 0;
+  while (len--) {
+    var val = arr[i++];
+    if (typeof val === 'function') {
+      res.push(function () {
+        return val.apply(this, arguments);
+      }.bind(this));
+    } else if (typeof val === 'object') {
+      res.push(val);
+    } else if (this.isFalse('plugin ' + val) || !this.plugins.hasOwnProperty(val)) {
+      res.push(through.obj());
+    } else {
+      res.push(this.plugins[val].call(this, options));
+    }
+  }
+  return es.pipe.apply(es, res);
+};
 
 /**
  * Glob patterns or filepaths to source files.
@@ -202,7 +233,7 @@ Object.defineProperty(App.prototype, 'taskFiles', {
   configurable: true,
   enumerable: true,
   get: function () {
-    return this.views[this.inflections[this.getTask()]];
+    return this.getCollection();
   }
 });
 
@@ -219,7 +250,6 @@ Object.defineProperty(App.prototype, 'taskFiles', {
 
 App.prototype.run = function() {
   var tasks = arguments.length ? arguments : ['default'];
-
   process.nextTick(function () {
     this.start.apply(this, tasks);
   }.bind(this));

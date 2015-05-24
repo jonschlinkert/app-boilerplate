@@ -35,29 +35,23 @@ describe('app output stream', function() {
       var outstream = app.dest(dest);
       instream.pipe(outstream);
 
-      outstream.on('error', function (err) {
-        console.log(err);
-        done();
-      });
-
+      outstream.on('error', done);
       outstream.on('data', function (file) {
-        console.log(file)
         should.exist(file);
         should.exist(file.path);
         should.exist(file.contents);
         path.join(file.path, '').should.equal(path.join(dest, 'example.txt'));
         String(file.contents).should.equal('this is a test');
       });
-      done()
 
-      // outstream.on('end', function () {
-      //   fs.readFile(path.join(dest, 'example.txt'), function (err, contents) {
-      //     should.not.exist(err);
-      //     should.exist(contents);
-      //     String(contents).should.equal('this is a test');
-      //     done();
-      //   });
-      // });
+      outstream.on('end', function () {
+        fs.readFile(path.join(dest, 'example.txt'), function (err, contents) {
+          should.not.exist(err);
+          should.exist(contents);
+          String(contents).should.equal('this is a test');
+          done();
+        });
+      });
     });
 
     it('should return an output stream that does not write non-read files', function (done) {

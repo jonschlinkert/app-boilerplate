@@ -2,43 +2,46 @@
 
 var through = require('through2');
 var app = require('./');
-var re = /(?:^|\s)(?:\/\*(?!\*?\/)([\s\S]+?)\*\/)/;
 
-// app.option({delims: ['{{', '}}']});
-app.layouts('test/fixtures/layouts/*.md');
-app.data({name: 'Jon', blah: 'abc'});
+app.plugin('foo', foo);
+app.plugin('bar', bar);
+app.plugin('baz', baz);
 
+app.disable('plugin bar');
 
 app.task('default', function () {
-  app.src('test/fixtures/foo.md')
+  app.src('test/fixtures/*.txt')
+    .pipe(app.combine(['foo', 'bar', 'baz'], {}))
     .pipe(app.dest('test/actual'))
 });
 
-// app.task('rename', function () {
-//   app.src(['test/temp/**/*.*', '!**/temp/**'])
-//     .pipe(through.obj(function(file, enc, cb) {
-//       file.path = file.path.split('assemble').join('app');
-//       var str = file.contents.toString();
-//       str = str.split('assemble.init()').join('new application.App()');
-//       str = str.split('var assemble = require(\'..\')').join('var application = require(\'..\')');
-//       str = str.split('site').join('app');
-//       str = strip(str).replace(/^\/\*\*\/\s+/g, '');
-//       str = str.split('assemble').join('app');
-//       file.contents = new Buffer(str);
-//       this.push(file);
-//       return cb();
-//     }))
-//     .pipe(app.dest('test'))
-// });
 
+function foo(options) {
+  return through.obj(function (file, enc, cb) {
+    var str = file.contents.toString();
 
-// function strip(str) {
-//   var match;
-//   while (match = re.exec(str)) {
-//     str = str.replace(match[1], '');
-//   }
-//   while (match = /(\/{2}[^\n]+)/.exec(str)) {
-//     str = str.replace(match[1], '');
-//   }
-//   return str;
-// }
+    file.contents = new Buffer(str + 'foo');
+    this.push(file);
+    return cb();
+  })
+}
+
+function bar(options) {
+  return through.obj(function (file, enc, cb) {
+    var str = file.contents.toString();
+
+    file.contents = new Buffer(str + 'bar');
+    this.push(file);
+    return cb();
+  })
+}
+
+function baz(options) {
+  return through.obj(function (file, enc, cb) {
+    var str = file.contents.toString();
+
+    file.contents = new Buffer(str + 'baz');
+    this.push(file);
+    return cb();
+  })
+}
