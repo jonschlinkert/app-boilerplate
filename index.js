@@ -6,6 +6,7 @@ var extend = require('lodash')._.extend;
 var Template = require('template');
 var toVinyl = require('to-vinyl');
 var Task = require('orchestrator');
+var tutils = require('template-utils')._;
 var vfs = require('vinyl-fs');
 
 var session = require('./lib/session');
@@ -34,7 +35,16 @@ Template.extend(App.prototype);
  * Glob patterns or filepaths to source files.
  *
  * ```js
- * app.src('src/*.hbs', {layout: 'default'})
+ * app.src('*.js')
+ * ```
+ *
+ * **Example usage**
+ *
+ * ```js
+ * app.task('web-app', function() {
+ *   app.src('templates/*')
+ *     app.dest(process.cwd())
+ * });
  * ```
  *
  * @param {String|Array} `glob` Glob patterns or file paths to source files.
@@ -54,7 +64,7 @@ App.prototype.src = function(glob, opts) {
  * ```
  *
  * @param {String|Function} `dest` File path or rename function.
- * @param {Object} `options` Options to `dest` plugins
+ * @param {Object} `options` Options or locals to pass to `dest` plugins
  * @api public
  */
 
@@ -66,9 +76,7 @@ App.prototype.dest = function(dest, opts) {
  * Copy a `glob` of files to the specified `dest`.
  *
  * ```js
- * app.task('assets', function() {
  *   app.copy('assets/**', 'dist');
- * });
  * ```
  *
  * @param  {String|Array} `glob`
@@ -82,11 +90,11 @@ App.prototype.copy = function(glob, dest, opts) {
 };
 
 /**
- * Define a App task.
+ * Define a task.
  *
  * ```js
  * app.task('docs', function() {
- *   app.src(['.app.md', 'docs/*.md'])
+ *   app.src(['.app.js', 'foo/*.js'])
  *     .pipe(app.dest('./'));
  * });
  * ```
@@ -174,7 +182,7 @@ App.prototype.getFile = function(file, id) {
  */
 
 App.prototype.pushToStream = function(id, stream) {
-  return utils.pushToStream(this.getCollection(id), stream, toVinyl);
+  return tutils.pushToStream(this.getCollection(id), stream, toVinyl);
 };
 
 /**
@@ -211,7 +219,10 @@ Object.defineProperty(App.prototype, 'taskFiles', {
 
 App.prototype.run = function() {
   var tasks = arguments.length ? arguments : ['default'];
-  this.start.apply(this, tasks);
+
+  process.nextTick(function () {
+    this.start.apply(this, tasks);
+  }.bind(this));
 };
 
 /**
