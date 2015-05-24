@@ -25,7 +25,6 @@ var init = require('./lib/init');
  */
 
 function App() {
-  App.__super__.defaultOptions.apply(this, arguments);
   Template.apply(this, arguments);
   Task.apply(this, arguments);
   this.session = session;
