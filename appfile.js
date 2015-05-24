@@ -19,7 +19,6 @@ app.task('default', function () {
 function foo(options) {
   return through.obj(function (file, enc, cb) {
     var str = file.contents.toString();
-
     file.contents = new Buffer(str + 'foo');
     this.push(file);
     return cb();

@@ -1,8 +1,6 @@
 'use strict';
 
-var diff = require('diff');
-var chalk = require('chalk');
-var extend = require('lodash')._.extend;
+var typeOf = require('kind-of');
 var es = require('event-stream');
 var through = require('through2');
 var Template = require('template');
@@ -10,10 +8,10 @@ var toVinyl = require('to-vinyl');
 var Task = require('orchestrator');
 var tutils = require('template-utils')._;
 var vfs = require('vinyl-fs');
+var _ = require('lodash');
 
 var session = require('./lib/session');
 var stack = require('./lib/stack');
-var utils = require('./lib/utils');
 var init = require('./lib/init');
 
 /**
@@ -31,7 +29,7 @@ function App() {
   init(this);
 }
 
-extend(App.prototype, Task.prototype);
+_.extend(App.prototype, Task.prototype);
 Template.extend(App.prototype);
 
 App.prototype.plugin = function(name, fn) {
@@ -47,11 +45,12 @@ App.prototype.combine = function(arr, options) {
   var res = [], i = 0;
   while (len--) {
     var val = arr[i++];
-    if (typeof val === 'function') {
-      res.push(function () {
-        return val.apply(this, arguments);
-      }.bind(this));
-    } else if (typeof val === 'object') {
+    if (typeOf(val) === 'function') {
+      res.push(val);
+      // res.push(function () {
+      //   return val.apply(this, arguments);
+      // }.bind(this));
+    } else if (typeOf(val) === 'object') {
       res.push(val);
     } else if (this.isFalse('plugin ' + val) || !this.plugins.hasOwnProperty(val)) {
       res.push(through.obj());
@@ -84,7 +83,13 @@ App.prototype.combine = function(arr, options) {
  */
 
 App.prototype.src = function(glob, opts) {
-  return stack.src(this, glob, opts);
+  var init = this.plugin('init');
+  opts = _.merge({}, this.options, opts);
+  session.set('src', opts);
+  return this.combine([
+    vfs.src(glob, opts),
+    init(opts)
+  ], opts);
 };
 
 /**
