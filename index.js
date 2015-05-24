@@ -10,8 +10,11 @@ var tutils = require('template-utils')._;
 var vfs = require('vinyl-fs');
 var _ = require('lodash');
 
+var render = require('template-render');
+var init = require('template-init');
+
+var plugins = require('./lib/plugins');
 var session = require('./lib/session');
-var stack = require('./lib/stack');
 var init = require('./lib/init');
 
 /**
@@ -22,6 +25,7 @@ var init = require('./lib/init');
  */
 
 function App() {
+  App.__super__.defaultOptions.apply(this, arguments);
   Template.apply(this, arguments);
   Task.apply(this, arguments);
   this.session = session;
@@ -32,30 +36,33 @@ function App() {
 _.extend(App.prototype, Task.prototype);
 Template.extend(App.prototype);
 
+
 App.prototype.plugin = function(name, fn) {
   if (arguments.length === 1) {
     return this.plugins[name];
   }
-  this.plugins[name] = fn.bind(this);
+  if (typeof fn === 'function') {
+    fn = fn.bind(this);
+  }
+  this.plugins[name] = fn;
   return this;
 };
 
-App.prototype.combine = function(arr, options) {
-  var len = arr.length;
-  var res = [], i = 0;
-  while (len--) {
-    var val = arr[i++];
+App.prototype.combine = function(plugins, options) {
+  var res = [];
+  for (var i = 0; i < plugins.length; i++) {
+    var val = plugins[i];
     if (typeOf(val) === 'function') {
-      res.push(val);
-      // res.push(function () {
-      //   return val.apply(this, arguments);
-      // }.bind(this));
+      res.push(val.call(this, options));
     } else if (typeOf(val) === 'object') {
       res.push(val);
-    } else if (this.isFalse('plugin ' + val) || !this.plugins.hasOwnProperty(val)) {
-      res.push(through.obj());
-    } else {
+    // } else if (!this.plugins.hasOwnProperty(val) || this.isFalse('plugin ' + val)) {
+    //   res.push(through.obj());
+    } else if (this.plugins.hasOwnProperty(val) && !this.isFalse('plugin ' + val)) {
       res.push(this.plugins[val].call(this, options));
+    } else {
+      res.push(through.obj());
+      // res.push(this.plugins[val].call(this, options));
     }
   }
   return es.pipe.apply(es, res);
@@ -83,12 +90,13 @@ App.prototype.combine = function(arr, options) {
  */
 
 App.prototype.src = function(glob, opts) {
-  var init = this.plugin('init');
   opts = _.merge({}, this.options, opts);
   session.set('src', opts);
+  var app = this;
+
   return this.combine([
     vfs.src(glob, opts),
-    init(opts)
+    app.plugin('init')(app)
   ], opts);
 };
 
@@ -105,14 +113,23 @@ App.prototype.src = function(glob, opts) {
  */
 
 App.prototype.dest = function(dest, opts) {
-  return stack.dest(this, dest, opts);
+  var srcOpts = session.get('src') || {};
+  opts = _.merge({}, this.options, srcOpts, opts);
+  var app = this;
+
+  return this.combine([
+    app.plugin('paths')(dest, opts),
+    app.plugin('lint'),
+    app.plugin('render')(opts),
+    app.plugin('dest')(dest, opts),
+  ], opts);
 };
 
 /**
  * Copy a `glob` of files to the specified `dest`.
  *
  * ```js
- *   app.copy('assets/**', 'dist');
+ * app.copy('assets/**', 'dist');
  * ```
  *
  * @param  {String|Array} `glob`
