@@ -1,10 +1,3 @@
-/**!
- * assemble <https://github.com/assemble/assemble>
- *
- * Copyright (c) 2014-2015, Jon Schlinkert, Brian Woodward.
- * Licensed under the MIT License (MIT).
- */
-
 'use strict';
 
 var assert = require('assert');
@@ -40,7 +33,7 @@ describe('helper loader', function () {
 
     actual.cache.should.have.property('foo');
     actual.cache.should.have.property('bar');
-    // assert.equal(typeof actual.cache.wrapped, 'object');
+    
   });
 
   describe('helper.object()', function () {

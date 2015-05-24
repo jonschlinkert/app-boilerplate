@@ -4,14 +4,14 @@ var path = require('path');
 var tap = require('gulp-tap');
 var should = require('should');
 var rimraf = require('rimraf');
-var assemble = require('..');
+var application = require('..');
 
-var site = null;
+var app = null;
 var actual = __dirname + '/assets-actual';
 
-describe('assemble assets plugin', function() {
+describe('app assets plugin', function() {
   before (function () {
-    site = assemble.init();
+    app = new application.App();
   });
 
   describe('assets()', function() {
@@ -24,9 +24,9 @@ describe('assemble assets plugin', function() {
 
     describe('when `assets` is defined on options:', function () {
       it('should calculate the correct `assets` property on the file.', function (done) {
-        site.set('assets', actual + '/assets');
-        var instream = site.src(path.join(__dirname, 'fixtures/assets/*.hbs'));
-        var outstream = site.dest(actual);
+        app.set('assets', actual + '/assets');
+        var instream = app.src(path.join(__dirname, 'fixtures/assets/*.hbs'));
+        var outstream = app.dest(actual);
 
         instream
           .pipe(tap(function (file) {
@@ -46,9 +46,9 @@ describe('assemble assets plugin', function() {
       });
 
       it('should calculate the correct `assets` property on the file when the dest changes.', function (done) {
-        site.set('assets', actual + '/assets');
-        var instream = site.src(path.join(__dirname, 'fixtures/assets/*.hbs'));
-        var outstream = site.dest(actual);
+        app.set('assets', actual + '/assets');
+        var instream = app.src(path.join(__dirname, 'fixtures/assets/*.hbs'));
+        var outstream = app.dest(actual);
         instream.pipe(outstream);
 
         outstream.on('error', done);

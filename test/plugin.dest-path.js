@@ -6,12 +6,12 @@ var should = require('should');
 var rimraf = require('rimraf');
 var Assemble = require('..');
 
-var assemble = null;
+var app = null;
 var actual = __dirname + '/actual/dest-path-actual';
 
 describe('dest-paths plugin', function() {
   before (function () {
-    assemble = Assemble.init();
+    app = Assemble.init();
   });
 
   beforeEach(function (done) {
@@ -23,9 +23,9 @@ describe('dest-paths plugin', function() {
 
   describe('when files are run through the pipe', function () {
     it('should keep dest the same before the dest path plugin is run.', function (done) {
-      assemble.option('assets', actual + '/assets');
-      var instream = assemble.src(path.join(__dirname, 'fixtures/paths/*.txt'));
-      var outstream = assemble.dest(actual);
+      app.option('assets', actual + '/assets');
+      var instream = app.src(path.join(__dirname, 'fixtures/paths/*.txt'));
+      var outstream = app.dest(actual);
 
       var i = 0;
       instream
@@ -51,9 +51,9 @@ describe('dest-paths plugin', function() {
     });
 
     it('should calculate the correct `assets` property on the file when the dest changes.', function (done) {
-      assemble.option('assets', actual + '/assets');
-      var instream = assemble.src(path.join(__dirname, 'fixtures/paths/*.txt'));
-      var outstream = assemble.dest(actual);
+      app.option('assets', actual + '/assets');
+      var instream = app.src(path.join(__dirname, 'fixtures/paths/*.txt'));
+      var outstream = app.dest(actual);
       instream.pipe(outstream);
 
       outstream.on('error', done);

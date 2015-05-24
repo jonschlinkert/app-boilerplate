@@ -1,19 +1,12 @@
-/**
- * assemble <https://github.com/assemble/assemble>
- *
- * Copyright (c) 2014-2015, Jon Schlinkert, Brian Woodward.
- * Licensed under the MIT License (MIT).
- */
-
 'use strict';
 
 var should = require('should');
-var assemble = require('..');
+var application = require('..');
 var app;
 
 describe('front matter', function () {
   beforeEach(function () {
-    app = assemble.init();
+    app = new application.App();
   });
 
   describe('options', function () {

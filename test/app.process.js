@@ -3,10 +3,10 @@
 var should = require('should');
 var application = require('..');
 
-describe('config process', function () {
+describe('app process', function () {
+  var app = null;
   beforeEach(function() {
-    app.del();
-    app.omit('abcdefghijklmnopqrstuvwxyz'.split(''));
+    app = new application.App();
   });
 
   describe('.process()', function () {
@@ -32,20 +32,20 @@ describe('config process', function () {
 
     describe('when functions are defined on the config', function() {
       it('should used them on config templates', function() {
-        app.set({
+        app.data({
           upper: function (str) {
             return str.toUpperCase();
           }
         });
 
-        app.set({fez: 'bang', pop: 'boom-pow!'});
-        app.set({whistle: '<%= upper(fez) %>-<%= upper(pop) %>'});
-        app.get('whistle').should.equal('<%= upper(fez) %>-<%= upper(pop) %>');
+        app.data({fez: 'bang', pop: 'boom-pow!'});
+        app.data({whistle: '<%= upper(fez) %>-<%= upper(pop) %>'});
+        app.get('data.whistle').should.equal('<%= upper(fez) %>-<%= upper(pop) %>');
 
-        var a = app.process(app.get('whistle'), app.get());
+        var a = app.process(app.get('data.whistle'), app.get('data'));
         a.should.equal('BANG-BOOM-POW!');
 
-        var b = app.process(app.get(), app.get());
+        var b = app.process(app.get('data'), app.get('data'));
         b.whistle.should.equal('BANG-BOOM-POW!');
       });
     });

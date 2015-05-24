@@ -3,14 +3,14 @@
 var path = require('path');
 var should = require('should');
 var rimraf = require('rimraf');
-var assemble = require('..');
+var application = require('..');
 
-var site = null;
+var app = null;
 var actual = __dirname + '/drafts-actual';
 
-describe('assemble drafts plugin', function() {
+describe('app drafts plugin', function() {
   before (function () {
-    site = assemble.init();
+    app = new application.App();
   });
 
   describe('drafts()', function() {
@@ -23,8 +23,8 @@ describe('assemble drafts plugin', function() {
 
     describe('when `draft: true` is defined in front matter:', function () {
       it('should not generate pages.', function (done) {
-        var instream = site.src(path.join(__dirname, 'fixtures/drafts/*.hbs'));
-        var outstream = site.dest(actual);
+        var instream = app.src(path.join(__dirname, 'fixtures/drafts/*.hbs'));
+        var outstream = app.dest(actual);
         instream.pipe(outstream);
 
         var i = 0;
@@ -42,7 +42,7 @@ describe('assemble drafts plugin', function() {
             String(file.path).should.match(/[ab]\.hbs$/);
             String(file.contents).should.match(/[foo]/i);
           }
-          Object.keys(site.views.pages).length.should.equal(3);
+          Object.keys(app.views.pages).length.should.equal(3);
         });
 
         outstream.on('end', function () {

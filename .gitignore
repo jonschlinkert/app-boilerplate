@@ -14,3 +14,4 @@ vendor
 benchmark
 coverage
 support
+!test/temp
